@@ -1,0 +1,33 @@
+name: Testes de Performance com k6
+
+# Quando vai rodar?
+on:
+  push:
+    branches: [master] # a cada push na main
+  workflow_dispatch:  # ou manualmente pelo GitHub
+
+jobs:
+  teste-performance:
+    name: Rodar k6
+    runs-on: ubuntu-latest # roda numa máquina Linux no GitHub
+
+    steps:
+      # 1. Baixa o código do repositório
+      - name: 📥 Checkout do código
+        uses: actions/checkout@v4
+
+      # 2. Instala o k6
+      - name: 🔧 Instalar k6
+        run: |
+          sudo gpg --no-default-keyring \
+            --keyring /usr/share/keyrings/k6-archive-keyring.gpg \
+            --keyserver hkp://keyserver.ubuntu.com:80 \
+            --recv-keys C5AD17C747E3415A3642D57D77C6C491D6AC1D69
+          echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main" \
+            | sudo tee /etc/apt/sources.list.d/k6.list
+          sudo apt-get update
+          sudo apt-get install -y k6
+
+      # 3. Roda os testes
+      - name: 🚀 Executar testes de performance
+        run: k6 run tests/Activities/activities.js
