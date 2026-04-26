@@ -38,5 +38,10 @@ jobs:
       # PASSO 3 — Roda os testes de performance
       # se algum threshold falhar, o pipeline para e mostra ❌
       # se tudo passar, mostra ✅
-      - name: 🚀 Executar testes de performance
-        run: k6 run tests/Activities/activities.js
+      - name: 🚀 Executar todos os testes
+        run: |
+          # encontra todos os arquivos .js e roda um por um
+          find tests/ -name "*.js" | while read file; do
+            echo "▶️ Rodando: $file"
+            k6 run "$file"
+          done
