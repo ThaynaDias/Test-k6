@@ -1,33 +1,42 @@
 name: Testes de Performance com k6
 
-# Quando vai rodar?
+# Define quando o pipeline vai rodar
 on:
+  # Roda automaticamente a cada push na branch master
   push:
-    branches: [master] # a cada push na main
-  workflow_dispatch:  # ou manualmente pelo GitHub
+    branches: [master]
+  # Permite rodar manualmente pelo GitHub (botão Run workflow)
+  workflow_dispatch:
 
+# Jobs são os conjuntos de tarefas que vão rodar
 jobs:
   teste-performance:
+    # Nome que aparece no GitHub Actions
     name: Rodar k6
-    runs-on: ubuntu-latest # roda numa máquina Linux no GitHub
 
+    # Tipo de máquina que vai rodar o pipeline
+    # ubuntu-latest = Linux gratuito fornecido pelo GitHub
+    runs-on: ubuntu-latest
+
+    # Steps são os passos executados em ordem
     steps:
-      # 1. Baixa o código do repositório
+
+      # PASSO 1 — Baixa o código do repositório para a máquina
+      # sem isso a máquina não teria acesso aos seus arquivos
       - name: 📥 Checkout do código
         uses: actions/checkout@v4
 
-      # 2. Instala o k6
+      # PASSO 2 — Instala o k6 na máquina Linux
+      # curl baixa o arquivo compactado do k6
+      # tar extrai o arquivo
+      # cp copia o executável para uma pasta do sistema
       - name: 🔧 Instalar k6
         run: |
-          sudo gpg --no-default-keyring \
-            --keyring /usr/share/keyrings/k6-archive-keyring.gpg \
-            --keyserver hkp://keyserver.ubuntu.com:80 \
-            --recv-keys C5AD17C747E3415A3642D57D77C6C491D6AC1D69
-          echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main" \
-            | sudo tee /etc/apt/sources.list.d/k6.list
-          sudo apt-get update
-          sudo apt-get install -y k6
+          curl https://github.com/grafana/k6/releases/download/v0.55.0/k6-v0.55.0-linux-amd64.tar.gz -L | tar xvz
+          sudo cp k6-v0.55.0-linux-amd64/k6 /usr/local/bin/k6
 
-      # 3. Roda os testes
+      # PASSO 3 — Roda os testes de performance
+      # se algum threshold falhar, o pipeline para e mostra ❌
+      # se tudo passar, mostra ✅
       - name: 🚀 Executar testes de performance
         run: k6 run tests/Activities/activities.js
