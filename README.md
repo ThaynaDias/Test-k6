@@ -98,17 +98,23 @@ http_req_failed: 0% ← zero erros
 ```
 
 ---
+## 📊 Relatórios HTML
 
-## 👩‍💻 Autora
+Os testes geram relatórios visuais automaticamente na pasta `reports/`.
 
-**Thayna Dias**  
-[GitHub](https://github.com/ThaynaDias)
-```
-
-Salva e faz push:
+### Como gerar
 
 ```bash
-git add .
-git commit -m "docs: adiciona README com documentacao completa"
-git push
+# Rodar o teste
+k6 run tests/Activities/get-activities.js
+
+# Abrir o relatório no navegador (Windows)
+start reports/get-activities.html
 ```
+
+### O relatório mostra:
+- ✅ Checks aprovados e reprovados
+- ⏱️ Tempo de resposta médio, mínimo e máximo
+- 📈 Gráfico de requisições por segundo
+- ❌ Taxa de erros
+
